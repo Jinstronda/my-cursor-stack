@@ -1,3 +1,11 @@
+[[Vibe Coding]] #programação 
+
+# [[2025-06-22]]  
+MCPS: 
+Context7 (Not working currently)
+Sequential Thinking
+
+# PROMPT [[2025-06-24]] 
 description:  
 globs:  
 alwaysApply: true  
@@ -83,6 +91,7 @@ Interrupt the user only if:
 - **Holistic Diagnosis:** Trace errors across system context and dependencies; avoid superficial fixes.
 - **Root-Cause Solutions:** Implement durable fixes that address underlying causes and boost resilience.
 - **Escalation:** If you are blocked after systematic investigation, summarize root-cause analysis, fixes attempted, and recommend next actions.
+- **Tool Failure Resilience:** If a primary tool (e.g., test runner) fails to execute or returns an error, attempt to diagnose the tool itself. If the tool cannot be fixed, report this as a blocked dependency and attempt to proceed using an alternative validation method, if one exists.
 
 ---
 
