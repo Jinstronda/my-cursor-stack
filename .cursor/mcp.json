@@ -1,28 +1,40 @@
 {
   "mcpServers": {
-    "context7": {
+    "supabase": {
       "command": "npx",
       "args": [
         "-y",
-        "@upstash/context7-mcp"
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_8d5ec8984bf422190e687a7a138e80b7b74cdeed"
       ]
     },
-    "Magic MCP": {
-      "command": "cmd",
+    "puppeteer": {
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
-        "@21st-dev/magic@latest",
-        "API_KEY=\"e35aa2638e567c8f717d660222e9a432de24f4a8fe728e6d7232b0f6bfb5a328\""
-      ],
-      "env": {}
+        "@modelcontextprotocol/server-puppeteer"
+      ]
     },
     "sequentialThinking": {
       "command": "npx",
       "args": [
         "-y",
         "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "context7"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
       ]
     }
   }
