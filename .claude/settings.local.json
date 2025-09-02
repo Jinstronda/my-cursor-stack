@@ -29,5 +29,10 @@
       "Bash(rm:*)"
     ],
     "deny": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase",
+    "playwright"
+  ],
+  "enableAllProjectMcpServers": true
 }

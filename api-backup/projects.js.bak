@@ -1,0 +1,222 @@
+/**
+ * Optimized Serverless Function for /api/projects
+ * Lightweight endpoint to avoid FUNCTION_INVOCATION_FAILED
+ * 
+ * This function is designed to:
+ * - Handle POST (create project) and PATCH (update project) operations
+ * - Have minimal cold start time
+ * - Avoid heavy Express server initialization
+ * - Provide fast project operations with authentication
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client with minimal overhead
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Missing Supabase environment variables');
+}
+
+const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
+
+/**
+ * Get user from JWT token (lightweight version)
+ */
+async function getUserFromToken(token) {
+  if (!supabase) {
+    console.log('❌ Supabase client not initialized');
+    return null;
+  }
+
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      console.log('❌ Invalid token or user not found');
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email || '',
+    };
+  } catch (error) {
+    console.error("Error getting user from token:", error);
+    return null;
+  }
+}
+
+/**
+ * Create a new project
+ */
+async function createProject(userId, projectData) {
+  if (!supabase) {
+    console.log('❌ Supabase client not initialized');
+    return null;
+  }
+
+  try {
+    console.log('🎬 Creating project for user:', userId);
+    
+    const { data: project, error } = await supabase
+      .from('projects')
+      .insert({
+        name: projectData.name || 'Novo Projeto',
+        description: projectData.description || null,
+        genre: projectData.genre || null,
+        status: projectData.status || 'esboço',
+        budget: projectData.budget || null,
+        user_id: userId,
+        is_public: projectData.is_public || false
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase create project error:', error.message);
+      return null;
+    }
+    
+    console.log('✅ Project created:', project.id);
+    return project;
+  } catch (error) {
+    console.error("Error creating project:", error);
+    return null;
+  }
+}
+
+/**
+ * Update existing project
+ */
+async function updateProject(projectId, userId, updates) {
+  if (!supabase) {
+    console.log('❌ Supabase client not initialized');
+    return null;
+  }
+
+  try {
+    console.log('🎬 Updating project:', projectId, 'for user:', userId);
+    
+    // First verify ownership
+    const { data: existingProject, error: checkError } = await supabase
+      .from('projects')
+      .select('id, user_id')
+      .eq('id', projectId)
+      .single();
+      
+    if (checkError || !existingProject) {
+      console.error('❌ Project not found:', checkError?.message);
+      return null;
+    }
+    
+    if (existingProject.user_id !== userId) {
+      console.error('❌ User does not own this project');
+      return null;
+    }
+    
+    // Update the project
+    const { data: project, error } = await supabase
+      .from('projects')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', projectId)
+      .eq('user_id', userId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('❌ Supabase update project error:', error.message);
+      return null;
+    }
+    
+    console.log('✅ Project updated:', project.id);
+    return project;
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return null;
+  }
+}
+
+/**
+ * Main serverless function handler
+ */
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  try {
+    const authHeader = req.headers.authorization;
+    console.log('🎬 Projects request received:', { 
+      method: req.method,
+      hasAuthHeader: !!authHeader, 
+      headerLength: authHeader?.length
+    });
+    
+    const token = authHeader?.replace('Bearer ', '');
+    
+    if (!token) {
+      console.log('❌ No token provided in request');
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    console.log('🔍 Validating token for projects access...');
+    const user = await getUserFromToken(token);
+    
+    if (!user) {
+      console.log('❌ Token validation failed for projects');
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    // Handle POST - Create Project
+    if (req.method === 'POST') {
+      console.log('✅ User authenticated, creating project...');
+      const project = await createProject(user.id, req.body);
+      
+      if (!project) {
+        return res.status(500).json({ message: "Failed to create project" });
+      }
+      
+      console.log(`✅ Project created successfully for user: ${user.email}`);
+      return res.status(201).json(project);
+    }
+
+    // Handle PATCH - Update Project
+    if (req.method === 'PATCH') {
+      const projectId = req.query.id || req.body.id;
+      
+      if (!projectId) {
+        return res.status(400).json({ message: "Project ID is required" });
+      }
+      
+      console.log('✅ User authenticated, updating project...');
+      const project = await updateProject(parseInt(projectId), user.id, req.body);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found or access denied" });
+      }
+      
+      console.log(`✅ Project updated successfully for user: ${user.email}`);
+      return res.json(project);
+    }
+
+    // Method not allowed
+    return res.status(405).json({ error: 'Method not allowed' });
+  } catch (error) {
+    console.error("❌ Error in projects function:", error);
+    res.status(500).json({ message: "Failed to process request" });
+  }
+}

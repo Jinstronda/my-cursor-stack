@@ -1,0 +1,546 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark theme by default - based on profile page */
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 95%);
+  --muted: hsl(240, 3.7%, 8%);
+  --muted-foreground: hsl(240, 5%, 55%);
+  --popover: hsl(240, 10%, 6%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --card: hsl(240, 3.7%, 6%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --border: hsl(240, 3.7%, 15%);
+  --input: hsl(240, 3.7%, 12%);
+  --primary: hsl(0, 0%, 95%);
+  --primary-foreground: hsl(240, 10%, 6%);
+  --secondary: hsl(240, 3.7%, 12%);
+  --secondary-foreground: hsl(0, 0%, 95%);
+  --accent: hsl(240, 3.7%, 15%);
+  --accent-foreground: hsl(0, 0%, 95%);
+  --destructive: hsl(0, 62.8%, 50%);
+  --destructive-foreground: hsl(0, 0%, 95%);
+  --ring: hsl(0, 0%, 95%);
+  --radius: 8px;
+}
+
+.dark {
+  /* Minimal dark theme matching the reference image */
+  --background: hsl(240, 10%, 6%);
+  --foreground: hsl(0, 0%, 88%);
+  --muted: hsl(240, 3.7%, 12%);
+  --muted-foreground: hsl(240, 5%, 55%);
+  --popover: hsl(240, 10%, 9%);
+  --popover-foreground: hsl(0, 0%, 88%);
+  --card: hsl(240, 3.7%, 9%);
+  --card-foreground: hsl(0, 0%, 88%);
+  --border: hsl(240, 3.7%, 15%);
+  --input: hsl(240, 3.7%, 9%);
+  --primary: hsl(0, 0%, 88%);
+  --primary-foreground: hsl(240, 10%, 6%);
+  --secondary: hsl(240, 3.7%, 12%);
+  --secondary-foreground: hsl(0, 0%, 88%);
+  --accent: hsl(240, 3.7%, 15%);
+  --accent-foreground: hsl(0, 0%, 88%);
+  --destructive: hsl(0, 62.8%, 50%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 88%);
+  --radius: 8px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-light antialiased bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    letter-spacing: -0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-normal tracking-tight;
+  }
+  
+  /* Minimal typography */
+  .text-minimal {
+    @apply text-muted-foreground text-sm leading-relaxed;
+  }
+  
+  .heading-minimal {
+    @apply text-foreground font-medium tracking-tight;
+  }
+}
+
+@layer components {
+  /* Minimal button style */
+  .btn-minimal {
+    @apply px-4 py-2 text-sm font-normal rounded-lg transition-all duration-200;
+    @apply border border-border bg-background hover:bg-accent;
+    @apply focus:outline-none focus:ring-1 focus:ring-ring;
+  }
+  
+  /* Minimal card style */
+  .card-minimal {
+    @apply bg-card border border-border rounded-lg;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Minimal input style */
+  .input-minimal {
+    @apply px-3 py-2 text-sm border border-border rounded-lg;
+    @apply bg-background placeholder:text-muted-foreground;
+    @apply focus:outline-none focus:ring-1 focus:ring-ring;
+  }
+  
+  /* Section spacing for minimal design */
+  .section-spacing {
+    @apply py-20 px-6;
+  }
+  
+  .content-spacing {
+    @apply space-y-12;
+  }
+}
+
+/* Minimal scrollbar styling */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Onboarding animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out;
+}
+
+/* Custom scrollbar class for chat areas */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent));
+}
+
+/* Animation for typing indicator */
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  } 40% {
+    transform: scale(1);
+  }
+}
+
+.typing-dot {
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+/* Message animations */
+.message-enter {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease-out;
+}
+
+.message-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fixed height and scroll for chat sections */
+.chat-container {
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Messages area styling - removed conflicting height/flex properties */
+
+/* Button focus styles */
+.btn-focus:focus {
+  outline: 2px solid var(--film-accent);
+  outline-offset: 2px;
+}
+
+/* Tool status modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Improved loading spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fix messages scroll area */
+.messages-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100%;
+}
+
+/* Editable title styles */
+.editable-title {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: all 0.2s ease;
+}
+
+.editable-title:hover {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.editable-title.editing {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  outline: none;
+}
+
+/* File attachment styles */
+.file-attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* Enhanced typing animation for AI status dots */
+@keyframes typing-dot-enhanced {
+  0%, 60%, 100% { 
+    transform: translateY(0); 
+    opacity: 0.3; 
+  }
+  30% { 
+    transform: translateY(-4px); 
+    opacity: 1; 
+  }
+}
+
+/* Document Reading Styles */
+@layer components {
+  .document-reader-prose {
+    /* Optimize typography for long-form reading */
+    line-height: 1.7;
+    font-size: 15px;
+    color: hsl(var(--foreground));
+  }
+  
+  .document-reader-prose h1,
+  .document-reader-prose h2,
+  .document-reader-prose h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: hsl(var(--foreground));
+  }
+  
+  .document-reader-prose h1 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid hsl(var(--border));
+    padding-bottom: 0.75rem;
+  }
+  
+  .document-reader-prose h2 {
+    font-size: 1.25rem;
+  }
+  
+  .document-reader-prose h3 {
+    font-size: 1.1rem;
+  }
+  
+  .document-reader-prose p {
+    margin-bottom: 1rem;
+    color: hsl(var(--foreground));
+  }
+  
+  .document-reader-prose ul,
+  .document-reader-prose ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .document-reader-prose li {
+    margin-bottom: 0.5rem;
+    color: hsl(var(--foreground));
+  }
+  
+  .document-reader-prose strong {
+    font-weight: 600;
+    color: hsl(var(--accent-foreground));
+  }
+  
+  .document-reader-prose em {
+    font-style: italic;
+    color: hsl(var(--muted-foreground));
+  }
+  
+  /* Custom scrollbar for document reader */
+  .document-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  
+  .document-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .document-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .document-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+  
+  .document-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent));
+  }
+}
+
+.typing-dot-1 {
+  animation: typing-dot-enhanced 1.4s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.typing-dot-2 {
+  animation: typing-dot-enhanced 1.4s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.typing-dot-3 {
+  animation: typing-dot-enhanced 1.4s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+/* Slow spin animation for 404 page film reels */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* Navigation Stability Architecture - Unified GPU Layer Management */
+@layer base {
+  /* Root level optimizations */
+  html {
+    scroll-behavior: smooth;
+    /* Prevent sub-pixel rendering globally */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    /* Ensure consistent rendering base */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
+@layer components {
+  /* GPU Layer Hierarchy - Z-Index coordination */
+  
+  /* Layer 1: Navigation Container (z-index: 50) */
+  .navigation-isolate {
+    /* Complete layout isolation */
+    contain: strict;
+    isolation: isolate;
+    /* GPU layer with perspective parent */
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    /* Prevent sub-pixel movements */
+    backface-visibility: hidden;
+    /* Reserve space to prevent layout shifts */
+    min-height: 60px;
+    /* Optimized backdrop blur performance */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* Force consistent stacking context */
+    position: relative;
+    z-index: 40;
+  }
+  
+  /* Layer 2: Header Container (z-index: 50) */
+  .header-isolate {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    /* GPU acceleration without competing transforms */
+    will-change: backdrop-filter;
+    /* Layout containment */
+    contain: layout style paint;
+    isolation: isolate;
+    /* Backdrop optimization */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* Prevent shifts */
+    min-height: 64px;
+  }
+  
+  /* Unified Transform System */
+  .nav-transition {
+    /* Single transition property for all transforms */
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* GPU acceleration baseline */
+    transform: translate3d(0, 0, 0);
+    /* Prevent competing will-change declarations */
+    will-change: transform;
+  }
+  
+  /* Layout Stability System */
+  .layout-stable {
+    /* Prevent layout thrashing during transitions */
+    contain: layout style;
+    /* Stable positioning context */
+    position: relative;
+    /* Subpixel rendering optimization */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  /* Performance Isolation for Route Transitions */
+  .route-container {
+    /* Complete isolation during route changes */
+    contain: layout style;
+    isolation: isolate;
+    /* Optimize for route transitions */
+    content-visibility: auto;
+    /* Prevent layout shifts */
+    min-height: 100vh;
+  }
+  
+  /* Navigation Transform Optimization */
+  .nav-transform-layer {
+    /* Dedicated transform layer */
+    transform-style: preserve-3d;
+    /* Precision rounding for sub-pixel prevention */
+    image-rendering: pixelated;
+    /* Hardware acceleration */
+    will-change: transform;
+  }
+  
+  /* Navigation Button Stability */
+  .nav-button-stable {
+    /* Fixed dimensions to prevent vertical displacement */
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    
+    /* Typography normalization */
+    line-height: 1 !important;
+    font-size: 14px !important; /* Fixed 14px = text-sm */
+    
+    /* Character rendering optimization for accents */
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+    /* Vertical alignment enforcement */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    /* Prevent layout shifts on hover/active states */
+    box-sizing: border-box !important;
+    border: 1px solid transparent !important;
+    
+    /* Text baseline normalization */
+    vertical-align: middle;
+    white-space: nowrap;
+    
+    /* Prevent sub-pixel rendering issues */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  /* Ensure hover/active states maintain exact dimensions */
+  .nav-button-stable:hover,
+  .nav-button-stable:active,
+  .nav-button-stable:focus {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    line-height: 1 !important;
+  }
+}
