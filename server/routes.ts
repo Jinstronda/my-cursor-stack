@@ -1,7 +1,7 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./supabaseAuth";
+import { requireAuth } from "./auth-simple";
 import { generateChatResponse, generateDocument, generateProjectMetadata } from "./services/openai";
 import { insertChatSessionSchema, insertMessageSchema, insertDocumentSchema, insertProjectSchema } from "@shared/schema";
 import { saveBase64Image } from "./uploads";
@@ -25,11 +25,8 @@ const getAuthenticatedUser = (req: any): AuthenticatedUser => {
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log('🚀 Registering server routes...');
   
-  // Setup auth middleware
-  await setupAuth(app);
-
-  // Auth routes are handled by setupAuth() - no need to duplicate
-  console.log('✅ Auth routes registered');
+  // Auth routes are handled by setupSimpleAuth() in index.ts
+  console.log('✅ Auth routes already registered by setupSimpleAuth');
 
   console.log('🔧 Registering API routes...');
 
@@ -38,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('✅ Editais routes registered');
 
   // Update user profile
-  app.patch('/api/users/profile', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/users/profile', requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
 
@@ -61,7 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user projects/chat sessions
-  app.get("/api/chat/sessions", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/sessions", requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
       
@@ -74,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new chat session (protected) - uses existing project or creates new one
-  app.post("/api/chat/sessions", isAuthenticated, async (req: any, res) => {
+  app.post("/api/chat/sessions", requireAuth, async (req: any, res) => {
     try {
       const user = getAuthenticatedUser(req);
       
@@ -113,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get chat session (protected)
-  app.get("/api/chat/sessions/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/sessions/:id", requireAuth, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.id);
       const session = await storage.getChatSession(sessionId);
@@ -129,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get chat session by project (protected)
-  app.get("/api/projects/:projectId/chat-session", isAuthenticated, async (req: any, res) => {
+  app.get("/api/projects/:projectId/chat-session", requireAuth, async (req: any, res) => {
     try {
       const projectId = parseInt(req.params.projectId);
       const user = req.user as AuthenticatedUser;
@@ -158,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get messages for a session (protected)
-  app.get("/api/chat/sessions/:id/messages", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/sessions/:id/messages", requireAuth, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -191,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Send message and get AI response (protected)
-  app.post("/api/chat/sessions/:id/messages", isAuthenticated, async (req: any, res) => {
+  app.post("/api/chat/sessions/:id/messages", requireAuth, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -402,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get documents for a session (protected)
-  app.get("/api/chat/sessions/:id/documents", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/sessions/:id/documents", requireAuth, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -437,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific document by type (protected)
-  app.get("/api/chat/sessions/:id/documents/:type", isAuthenticated, async (req: any, res) => {
+  app.get("/api/chat/sessions/:id/documents/:type", requireAuth, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.id);
       const { type } = req.params;
@@ -475,7 +472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update specific section of a document (protected)
-  app.patch("/api/chat/sessions/:sessionId/documents/:documentId/sections/:sectionIndex", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/chat/sessions/:sessionId/documents/:documentId/sections/:sectionIndex", requireAuth, async (req: any, res) => {
     try {
       const sessionId = parseInt(req.params.sessionId);
       const documentId = parseInt(req.params.documentId);
@@ -585,7 +582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Projects API
   // Get user's projects
-  app.get("/api/projects/my", isAuthenticated, async (req: any, res) => {
+  app.get("/api/projects/my", requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
       if (!user) {
@@ -628,7 +625,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create project
-  app.post("/api/projects", isAuthenticated, async (req: any, res) => {
+  app.post("/api/projects", requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
       if (!user) {
@@ -703,7 +700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update project
-  app.patch("/api/projects/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/projects/:id", requireAuth, async (req: any, res) => {
     try {
       const projectId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -749,7 +746,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get chat session for project (protected)
-  app.get("/api/projects/:id/chat-session", isAuthenticated, async (req: any, res) => {
+  app.get("/api/projects/:id/chat-session", requireAuth, async (req: any, res) => {
     try {
       const projectId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -777,7 +774,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete project (protected)
-  app.delete("/api/projects/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/projects/:id", requireAuth, async (req: any, res) => {
     try {
       const projectId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -822,7 +819,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user's production company (protected)
-  app.get("/api/production-companies/user", isAuthenticated, async (req: any, res) => {
+  app.get("/api/production-companies/user", requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
       if (!user) {
@@ -844,7 +841,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user's production companies (protected)
-  app.get("/api/production-companies/my", isAuthenticated, async (req: any, res) => {
+  app.get("/api/production-companies/my", requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
       if (!user) {
@@ -877,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create production company (protected)
-  app.post("/api/production-companies", isAuthenticated, async (req: any, res) => {
+  app.post("/api/production-companies", requireAuth, async (req: any, res) => {
     try {
       const user = req.user as AuthenticatedUser;
       if (!user) {
@@ -894,7 +891,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update production company (protected)
-  app.patch("/api/production-companies/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/production-companies/:id", requireAuth, async (req: any, res) => {
     try {
       const companyId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;
@@ -948,7 +945,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete production company (protected)
-  app.delete("/api/production-companies/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/production-companies/:id", requireAuth, async (req: any, res) => {
     try {
       const companyId = parseInt(req.params.id);
       const user = req.user as AuthenticatedUser;

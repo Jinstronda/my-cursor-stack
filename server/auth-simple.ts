@@ -5,11 +5,14 @@
 import type { Express, RequestHandler } from "express";
 import { supabase } from "./supabase-simple";
 
-// Simple user type
+// Simple user type - compatible with routes expectations
 interface SimpleUser {
   id: string;
   email: string;
   name: string;
+  username: string;
+  profileImageUrl?: string;
+  [key: string]: any;
 }
 
 // Get user from JWT token - simplified version
@@ -28,6 +31,10 @@ async function getUserFromToken(token: string): Promise<SimpleUser | null> {
             user.user_metadata?.name || 
             user.email?.split('@')[0] || 
             'User',
+      username: user.email || '',
+      profileImageUrl: user.user_metadata?.avatar_url || 
+                      user.user_metadata?.picture || 
+                      null,
     };
   } catch (error) {
     console.error("Token validation error:", error);
