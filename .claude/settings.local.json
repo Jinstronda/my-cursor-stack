@@ -124,7 +124,11 @@
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_wait_for",
       "Bash(timeout 5 sleep 3)",
-      "Bash(env)"
+      "Bash(env)",
+      "Read(//c/Users/joaop/**)",
+      "Bash(claude config list)",
+      "Bash(claude permissions list)",
+      "Bash(claude doctor)"
     ],
     "deny": []
   },
