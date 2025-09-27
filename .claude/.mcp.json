@@ -3,6 +3,7 @@
     "supabase": {
       "command": "npx",
       "args": [
+        "-y",
         "@supabase/mcp-server-supabase@latest",
         "--access-token",
         "sbp_8d5ec8984bf422190e687a7a138e80b7b74cdeed"
@@ -11,30 +12,28 @@
     "puppeteer": {
       "command": "npx",
       "args": [
-        "@modelcontextprotocol/server-puppeteer@latest"
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
       ]
     },
     "sequentialThinking": {
       "command": "npx",
       "args": [
-        "@modelcontextprotocol/server-sequential-thinking@latest"
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
       ]
     },
     "context7": {
       "command": "npx",
       "args": [
-        "@upstash/context7-mcp@latest"
-      ]
-    },
-    "desktop-commander": {
-      "command": "npx",
-      "args": [
-        "@wonderwhy-er/desktop-commander@latest"
+        "-y",
+        "context7"
       ]
     },
     "playwright": {
       "command": "npx",
       "args": [
+        "-y",
         "@playwright/mcp@latest"
       ]
     }
